@@ -11,8 +11,18 @@ def build_system_prompt(persona_prompt: str, chunks: list[str]) -> str:
     return f"{persona_prompt}\n\nThe following is relevant background knowledge, please refer to it when answering:\n---\n{context}\n---"
 
 
-def run_agent(persona_prompt, query, rag_context) -> dict:
-    llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
+def run_agent(persona_prompt, query, rag_context, on_token=None):
+    callbacks = []
+    if on_token:
+        from .streaming import StreamingCallbackHandler
+        callbacks = [StreamingCallbackHandler(on_token)]
+
+    llm = ChatAnthropic(
+        model="claude-haiku-4-5-20251001",
+        streaming=True,
+        callbacks=callbacks
+        )
+        
     tools = [get_current_datetime, calculator, web_search, get_weather]
 
     system_prompt = build_system_prompt(persona_prompt, rag_context)
