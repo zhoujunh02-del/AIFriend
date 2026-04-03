@@ -11,7 +11,10 @@ def build_system_prompt(persona_prompt: str, chunks: list[str]) -> str:
     return f"{persona_prompt}\n\nThe following is relevant background knowledge, please refer to it when answering:\n---\n{context}\n---"
 
 
-def run_agent(persona_prompt, query, rag_context, on_token=None):
+def run_agent(persona_prompt, query, rag_context, history=None, on_token=None):
+    if history is None:
+        history = []
+        
     callbacks = []
     if on_token:
         from .streaming import StreamingCallbackHandler
@@ -29,6 +32,7 @@ def run_agent(persona_prompt, query, rag_context, on_token=None):
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
+        *history,
         ("human", "{input}"),
         ("placeholder", "{agent_scratchpad}"),
     ])
