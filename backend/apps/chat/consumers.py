@@ -15,11 +15,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         query = data["message"]
         persona_prompt = data.get("persona_prompt", "You are a helpful assistant.")
 
-        async def send_token(token):
-            await self.send(json.dumps({"type": "token", "content": token}))
-    
+        loop = asyncio.get_event_loop()
+
+        def send_token(token):
+            asyncio.run_coroutine_threadsafe(
+                self.send(json.dumps({"type": "token", "content": token})),
+                loop
+            )
+
         result = await asyncio.to_thread(
             run_agent, persona_prompt, query, [], send_token
-    )
+        )
 
         await self.send(json.dumps({"type": "done", "function_calls_log": result["function_call_log"]}))
