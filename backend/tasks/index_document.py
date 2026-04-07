@@ -12,7 +12,7 @@ def index_document(document_id: str):
     try:
         text = parse_document(document.file_path)
         chunks = chunk_text(text)
-        add_chunks(document.knowledge_base.collection_name, chunks)
+        add_chunks(document.knowledge_base.chroma_collection_name, chunks)
 
     except Exception as e:
         document.status = "failed"

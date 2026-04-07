@@ -2,6 +2,7 @@ from datasets import Dataset
 from ragas import evaluate
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 from .pipeline import rag_query
+from services.agent.agent import run_agent
 
 def evaluate_rag(test_cases: list[dict], retriever, reranker) -> dict:
     questions = []
@@ -10,8 +11,9 @@ def evaluate_rag(test_cases: list[dict], retriever, reranker) -> dict:
     ground_truths = []
 
     for case in test_cases:
-        answer = rag_query(case["persona_prompt"], case["question"], retriever, reranker)
-        contexts = reranker.rerank(case["question"], retriever.retrieve(case["question"]), top_k=3)
+        contexts = rag_query(case["persona_prompt"], case["question"], retriever, reranker)
+        result = run_agent(case["persona_prompt"], case["question"], contexts)
+        answer = result["answer"]
         
         questions.append(case["question"])
         answers.append(answer)
