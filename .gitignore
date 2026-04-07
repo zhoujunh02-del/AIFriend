@@ -36,6 +36,9 @@ chroma_data/
 *.swp
 *.swo
 
+# Node
+node_modules/
+
 # macOS
 .DS_Store
 
